@@ -7,16 +7,17 @@ plugins {
     application
 }
 
+application {
+    mainClass = "com.krizaldis.parceldelivery.ParcelDeliveryApplicationKt"
+}
+
+
 
 dependencies {
     implementation(project(":domain"))
     implementation(project(":infrastructure"))
 
-    implementation("org.springframework.boot:spring-boot-starter")
+    implementation(libs.spring.boot.starter)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-application {
-    mainClass = "com.krizaldis.parceldelivery.ParcelDeliveryApplicationKt"
+    testImplementation(libs.spring.boot.starter.test)
 }
