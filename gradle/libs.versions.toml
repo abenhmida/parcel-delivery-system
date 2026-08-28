@@ -8,6 +8,10 @@ spring-boot = "3.5.5"
 spring-dependency-management = "1.1.7"
 assertj = "3.27.4"
 
+jooq = "3.20.6"
+flyway = "11.12.0"
+postgresql = "42.7.7"
+
 [libraries]
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-jupiter" }
@@ -15,10 +19,20 @@ junit-platform-engine = { module = "org.junit.platform:junit-platform-engine", v
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+jooq = { module = "org.jooq:jooq", version.ref = "jooq" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
+flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+
+jooq-codegen = { id = "org.jooq.jooq-codegen-gradle", version.ref = "jooq" }
