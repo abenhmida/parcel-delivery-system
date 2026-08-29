@@ -28,8 +28,8 @@ class ParcelController(
     ): ParcelResponse {
         val parcel =
             parcelService.create(
-                sender = request.sender,
-                recipient = request.recipient,
+                sender = Address.from(request.sender),
+                recipient = Address.from(request.recipient),
                 weight = request.weight,
             )
 
@@ -49,6 +49,15 @@ class ParcelController(
         return ParcelResponse.from(parcel)
     }
 }
+
+fun Address.Companion.from(address: AddressDTO): Address =
+    Address(
+        name = address.name,
+        street = address.street,
+        city = address.city,
+        postalCode = address.postalCode,
+        country = address.country,
+    )
 
 data class ParcelResponse(
     val id: UUID,
@@ -115,4 +124,13 @@ data class AddressDTO(
                 country = sender.country,
             )
     }
+
+    fun AddressDTO.toAddress(): Address =
+        Address(
+            name = this.name,
+            street = this.street,
+            city = this.city,
+            postalCode = this.postalCode,
+            country = this.country,
+        )
 }

@@ -6,4 +6,6 @@ data class Address(
     val city: String,
     val postalCode: String,
     val country: String,
-)
+) {
+    companion object
+}

@@ -1,6 +1,5 @@
 package com.krizaldis.parceldelivery.rest
 
-import com.krizaldis.parceldelivery.domain.Address
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
@@ -55,23 +54,23 @@ class ParcelControllerTest {
             .then()
             .statusCode(200)
             .body("id", notNullValue())
-            .body("trackingNumber", notNullValue())
+            .body("tracking_number", notNullValue())
             .body("sender.name", equalTo("Alice Sender"))
             .body("sender.street", equalTo("Sender Street 1"))
             .body("sender.city", equalTo("Berlin"))
-            .body("sender.postalCode", equalTo("10115"))
+            .body("sender.postal_code", equalTo("10115"))
             .body("sender.country", equalTo("DE"))
             .body("recipient.name", equalTo("Bob Receiver"))
             .body("recipient.street", equalTo("Receiver Street 2"))
             .body("recipient.city", equalTo("Munich"))
-            .body("recipient.postalCode", equalTo("80331"))
+            .body("recipient.postal_code", equalTo("80331"))
             .body("recipient.country", equalTo("DE"))
             .body("weight", equalTo(2.500f))
             .body("status", equalTo("CREATED"))
-            .body("createdAt", notNullValue())
-            .body("trackingEvents", hasSize<Any>(1))
-            .body("trackingEvents[0].status", equalTo("CREATED"))
-            .body("trackingEvents[0].occurredAt", notNullValue())
+            .body("created_at", notNullValue())
+            .body("tracking_events", hasSize<Any>(1))
+            .body("tracking_events[0].status", equalTo("CREATED"))
+            .body("tracking_events[0].occurred_at", notNullValue())
     }
 
     @Test
@@ -121,9 +120,9 @@ class ParcelControllerTest {
             .body("recipient.name", equalTo("David Receiver"))
             .body("weight", equalTo(1.750f))
             .body("status", equalTo("CREATED"))
-            .body("trackingEvents", hasSize<Any>(1))
-            .body("trackingEvents[0].parcelId", equalTo(createdParcelId))
-            .body("trackingEvents[0].status", equalTo("CREATED"))
+            .body("tracking_events", hasSize<Any>(1))
+            .body("tracking_events[0].parcel_id", equalTo(createdParcelId))
+            .body("tracking_events[0].status", equalTo("CREATED"))
     }
 
     @Test
