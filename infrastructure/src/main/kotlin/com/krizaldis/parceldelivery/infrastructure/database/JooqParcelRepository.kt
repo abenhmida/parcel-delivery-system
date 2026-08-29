@@ -5,8 +5,6 @@ import com.krizaldis.parceldelivery.domain.ParcelRepository
 import org.jooq.DSLContext
 import java.util.UUID
 
-const val PARCELS = "parcels"
-
 class JooqParcelRepository(
     private val dsl: DSLContext,
 ) : ParcelRepository {
