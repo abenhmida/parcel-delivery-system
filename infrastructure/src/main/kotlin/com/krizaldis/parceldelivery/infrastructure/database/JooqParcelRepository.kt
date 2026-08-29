@@ -39,7 +39,15 @@ class JooqParcelRepository(
                 .set(PARCELS.WEIGHT, parcel.weight)
                 .set(PARCELS.STATUS, parcel.status.name)
                 .set(PARCELS.CREATED_AT, OffsetDateTime.ofInstant(parcel.createdAt, ZoneId.systemDefault()))
+                .onConflict(PARCELS.ID)
+                .doUpdate()
+                .set(PARCELS.STATUS, parcel.status.name)
                 .execute()
+
+            /*txDsl
+                .deleteFrom(TRACKING_EVENTS)
+                .where(TRACKING_EVENTS.PARCEL_ID.eq(parcel.id))
+                .execute()*/
 
             parcel.trackingEvents.forEach { event ->
                 txDsl
