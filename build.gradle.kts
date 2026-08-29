@@ -40,5 +40,8 @@ subprojects {
         testLogging {
             events("passed", "skipped", "failed")
         }
+        environment("DOCKER_API_VERSION", "1.44")
+        systemProperty("docker.api.version", "1.44")
+        systemProperty("api.version", "1.44")
     }
 }

@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.jooq.codegen)
 }
 
@@ -7,6 +8,12 @@ dependencies {
     implementation(project(":domain"))
 
     implementation(libs.jooq)
+    implementation(libs.jooq.kotlin)
+
+    implementation(libs.spring.boot.starter)
+    implementation(libs.spring.context)
+    implementation(libs.spring.boot.jooq)
+    implementation(libs.jooq.kotlin)
 
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
@@ -14,6 +21,12 @@ dependencies {
     runtimeOnly(libs.postgresql)
     jooqCodegen(libs.postgresql)
     jooqCodegen(libs.jooqMetaExtensions)
+
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.testcontainers)
+    testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.postgresql)
 }
 
 jooq {
@@ -29,6 +42,10 @@ jooq {
                     property {
                         key = "sort"
                         value = "flyway"
+                    }
+                    property {
+                        key = "defaultNameCase"
+                        value = "lower"
                     }
                 }
             }

@@ -2,6 +2,7 @@ package com.krizaldis.parceldelivery.domain
 
 import java.math.BigDecimal
 import java.time.Clock
+import java.util.UUID
 
 class ParcelService(
     private val parcelRepository: ParcelRepository,
@@ -26,4 +27,6 @@ class ParcelService(
 
         return parcel
     }
+
+    fun get(id: UUID): Parcel? = parcelRepository.findById(id)
 }

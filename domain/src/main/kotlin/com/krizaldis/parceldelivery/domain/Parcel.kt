@@ -112,26 +112,26 @@ class Parcel private constructor(
                     ),
             )
         }
-    }
 
-    internal fun restore(
-        id: UUID,
-        trackingNumber: String,
-        sender: Address,
-        recipient: Address,
-        weight: BigDecimal,
-        createdAt: Instant,
-        status: ParcelStatus,
-        trackingEvents: List<TrackingEvent>,
-    ): Parcel =
-        Parcel(
-            id = id,
-            trackingNumber = trackingNumber,
-            sender = sender,
-            recipient = recipient,
-            weight = weight,
-            createdAt = createdAt,
-            initialStatus = status,
-            initialTrackingEvents = trackingEvents,
-        )
+        fun restore(
+            id: UUID,
+            trackingNumber: String,
+            sender: Address,
+            recipient: Address,
+            weight: BigDecimal,
+            createdAt: Instant,
+            status: ParcelStatus,
+            trackingEvents: List<TrackingEvent>,
+        ): Parcel =
+            Parcel(
+                id = id,
+                trackingNumber = trackingNumber,
+                sender = sender,
+                recipient = recipient,
+                weight = weight,
+                createdAt = createdAt,
+                initialStatus = status,
+                initialTrackingEvents = trackingEvents,
+            )
+    }
 }
