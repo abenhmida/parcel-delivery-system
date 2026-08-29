@@ -1,5 +1,7 @@
 package com.krizaldis.parceldelivery.rest
 
+import com.krizaldis.parceldelivery.api.AddressDTO
+import com.krizaldis.parceldelivery.api.CreateParcelRequest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
@@ -9,13 +11,32 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
 import java.math.BigDecimal
 import java.util.UUID
 
+@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ParcelControllerTest {
     @LocalServerPort
     private var port: Int = 0
+
+    companion object {
+        @Container
+        private val postgres = PostgreSQLContainer("postgres:17")
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun registerDynamicProperties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.datasource.url", postgres::getJdbcUrl)
+            registry.add("spring.datasource.username", postgres::getUsername)
+            registry.add("spring.datasource.password", postgres::getPassword)
+        }
+    }
 
     @BeforeEach
     fun setUp() {
@@ -126,6 +147,162 @@ class ParcelControllerTest {
     }
 
     @Test
+    fun `should get parcel by tracking number successfully`() {
+        val request =
+            CreateParcelRequest(
+                sender =
+                    AddressDTO(
+                        name = "Eve Sender",
+                        street = "East St 5",
+                        city = "Cologne",
+                        postalCode = "50667",
+                        country = "DE",
+                    ),
+                recipient =
+                    AddressDTO(
+                        name = "Frank Receiver",
+                        street = "West St 6",
+                        city = "Dusseldorf",
+                        postalCode = "40213",
+                        country = "DE",
+                    ),
+                weight = BigDecimal("3.000"),
+            )
+
+        val trackingNumber: String =
+            RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .`when`()
+                .post("/parcels")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("tracking_number")
+
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/parcels/tracking/{trackingNumber}", trackingNumber)
+            .then()
+            .statusCode(200)
+            .body("tracking_number", equalTo(trackingNumber))
+            .body("sender.name", equalTo("Eve Sender"))
+            .body("recipient.name", equalTo("Frank Receiver"))
+            .body("status", equalTo("CREATED"))
+    }
+
+    @Test
+    fun `should return 404 when parcel not found by tracking number`() {
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/parcels/tracking/{trackingNumber}", "NON-EXISTENT-TRK")
+            .then()
+            .statusCode(404)
+            .body("code", equalTo("PARCEL_NOT_FOUND"))
+            .body("message", equalTo("NON-EXISTENT-TRK"))
+    }
+
+    @Test
+    fun `should transition parcel status through lifecycle`() {
+        val request =
+            CreateParcelRequest(
+                sender =
+                    AddressDTO(
+                        name = "Grace Sender",
+                        street = "Grace St 1",
+                        city = "Stuttgart",
+                        postalCode = "70173",
+                        country = "DE",
+                    ),
+                recipient =
+                    AddressDTO(
+                        name = "Heidi Receiver",
+                        street = "Heidi St 2",
+                        city = "Nuremberg",
+                        postalCode = "90403",
+                        country = "DE",
+                    ),
+                weight = BigDecimal("4.200"),
+            )
+
+        val parcelId: String =
+            RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .`when`()
+                .post("/parcels")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("id")
+
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/parcels/{id}/pickup", parcelId)
+            .then()
+            .statusCode(200)
+            .body("status", equalTo("PICKED_UP"))
+
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/parcels/{id}/sorting", parcelId)
+            .then()
+            .statusCode(200)
+            .body("status", equalTo("AT_SORTING_CENTER"))
+
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/parcels/{id}/dispatch", parcelId)
+            .then()
+            .statusCode(200)
+            .body("status", equalTo("IN_TRANSIT"))
+
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/parcels/{id}/out-for-delivery", parcelId)
+            .then()
+            .statusCode(200)
+            .body("status", equalTo("OUT_FOR_DELIVERY"))
+
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/parcels/{id}/deliver", parcelId)
+            .then()
+            .statusCode(200)
+            .body("status", equalTo("DELIVERED"))
+    }
+
+    @Test
+    fun `should return 404 when transition non existent parcel`() {
+        val nonExistentId = UUID.randomUUID()
+
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/parcels/{id}/pickup", nonExistentId)
+            .then()
+            .statusCode(404)
+            .body("code", equalTo("PARCEL_NOT_FOUND"))
+    }
+
+    @Test
     fun `should return 404 when parcel not found`() {
         val nonExistentId = UUID.randomUUID()
 
@@ -136,6 +313,8 @@ class ParcelControllerTest {
             .get("/parcels/{id}", nonExistentId)
             .then()
             .statusCode(404)
+            .body("code", equalTo("PARCEL_NOT_FOUND"))
+            .body("message", equalTo("Parcel with id $nonExistentId not found"))
     }
 
     @Test

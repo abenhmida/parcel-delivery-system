@@ -1,7 +1,7 @@
 package com.krizaldis.parceldelivery.configuration
 
+import com.krizaldis.parceldelivery.application.ParcelApplicationService
 import com.krizaldis.parceldelivery.domain.ParcelRepository
-import com.krizaldis.parceldelivery.domain.ParcelService
 import com.krizaldis.parceldelivery.domain.RandomTrackingNumberGenerator
 import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
 import org.springframework.context.annotation.Bean
@@ -14,8 +14,8 @@ class ParcelDeliveryConfiguration {
     fun parcelService(
         parcelRepository: ParcelRepository,
         trackingNumberGenerator: TrackingNumberGenerator,
-    ): ParcelService =
-        ParcelService(
+    ): ParcelApplicationService =
+        ParcelApplicationService(
             parcelRepository = parcelRepository,
             trackingNumberGenerator = trackingNumberGenerator,
             clock = Clock.systemUTC(),
