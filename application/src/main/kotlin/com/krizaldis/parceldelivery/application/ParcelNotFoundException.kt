@@ -1,4 +1,5 @@
 package com.example.parceldelivery.application
 
-class ParcelNotFoundException(identifier: String) :
-    RuntimeException("Parcel not found: $identifier")
+class ParcelNotFoundException(
+    identifier: String,
+) : RuntimeException("Parcel with id $identifier not found")

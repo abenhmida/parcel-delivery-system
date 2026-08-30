@@ -1,5 +1,6 @@
 package com.krizaldis.parceldelivery.api
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.krizaldis.parceldelivery.domain.Address
 import com.krizaldis.parceldelivery.domain.Parcel
 import java.math.BigDecimal
@@ -10,7 +11,7 @@ data class AddressRequest(
     val name: String,
     val street: String,
     val city: String,
-    val postalCode: String,
+    @field:JsonProperty("postal_code") val postalCode: String,
     val country: String,
 ) {
     fun toDomain() = Address(name, street, city, postalCode, country)
@@ -26,7 +27,7 @@ data class AddressResponse(
     val name: String,
     val street: String,
     val city: String,
-    val postalCode: String,
+    @field:JsonProperty("postal_code") val postalCode: String,
     val country: String,
 ) {
     companion object {
@@ -43,12 +44,12 @@ data class AddressResponse(
 
 data class ParcelResponse(
     val id: UUID,
-    val trackingNumber: String,
+    @field:JsonProperty("tracking_number") val trackingNumber: String,
     val status: String,
     val sender: AddressResponse,
     val recipient: AddressResponse,
     val weight: BigDecimal,
-    val createdAt: Instant,
+    @field:JsonProperty("created_at") val createdAt: Instant,
 ) {
     companion object {
         fun from(parcel: Parcel) =
@@ -67,12 +68,12 @@ data class ParcelResponse(
 data class TrackingEventResponse(
     val id: UUID,
     val status: String,
-    val occurredAt: Instant,
+    @field:JsonProperty("occurred_at") val occurredAt: Instant,
 )
 
 data class TrackingResponse(
-    val parcelId: UUID,
-    val trackingNumber: String,
+    @field:JsonProperty("parcel_id") val parcelId: UUID,
+    @field:JsonProperty("tracking_number") val trackingNumber: String,
     val events: List<TrackingEventResponse>,
 )
 

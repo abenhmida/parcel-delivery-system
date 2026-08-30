@@ -60,28 +60,42 @@ class Parcel private constructor(
                 ),
         )
 
-    fun pickUp() = transitionTo(ParcelStatus.PICKED_UP)
+    fun pickUp(clock: Clock) = transitionTo(ParcelStatus.PICKED_UP, clock)
 
-    fun arriveAtSortingCenter() = transitionTo(ParcelStatus.AT_SORTING_CENTER)
+    fun arriveAtSortingCenter(clock: Clock) = transitionTo(ParcelStatus.AT_SORTING_CENTER, clock)
 
-    fun dispatch() = transitionTo(ParcelStatus.IN_TRANSIT)
+    fun dispatch(clock: Clock) = transitionTo(ParcelStatus.IN_TRANSIT, clock)
 
-    fun outForDelivery() = transitionTo(ParcelStatus.OUT_FOR_DELIVERY)
+    fun outForDelivery(clock: Clock) = transitionTo(ParcelStatus.OUT_FOR_DELIVERY, clock)
 
-    fun deliver() = transitionTo(ParcelStatus.DELIVERED)
+    fun deliver(clock: Clock) = transitionTo(ParcelStatus.DELIVERED, clock)
 
-    fun deliveryFailed() = transitionTo(ParcelStatus.DELIVERY_FAILED)
+    fun deliveryFailed(clock: Clock) = transitionTo(ParcelStatus.DELIVERY_FAILED, clock)
 
-    fun retryDelivery() = transitionTo(ParcelStatus.OUT_FOR_DELIVERY)
+    fun retryDelivery(clock: Clock) = transitionTo(ParcelStatus.OUT_FOR_DELIVERY, clock)
 
-    fun returnToSender() = transitionTo(ParcelStatus.RETURNED)
+    fun returnToSender(clock: Clock) = transitionTo(ParcelStatus.RETURNED, clock)
 
-    private fun transitionTo(newStatus: ParcelStatus) {
-        check(newStatus in allowedTransitions.getValue(currentStatus)) {
+    private fun transitionTo(
+        newStatus: ParcelStatus,
+        clock: Clock,
+    ) {
+        val allowed = allowedTransitions[currentStatus].orEmpty()
+
+        check(newStatus in allowed) {
             "Invalid parcel transition: $currentStatus -> $newStatus"
         }
         currentStatus = newStatus
+        events +=
+            TrackingEvent(
+                id = UUID.randomUUID(),
+                parcelId = id,
+                status = newStatus,
+                occurredAt = Instant.now(clock),
+            )
     }
+
+    fun latestTrackingEvent(): TrackingEvent = events.last()
 
     companion object {
         fun create(
@@ -91,6 +105,9 @@ class Parcel private constructor(
             trackingNumber: String,
             clock: Clock,
         ): Parcel {
+            require(trackingNumber.isNotBlank()) { "Tracking number must not be blank" }
+            require(weight > BigDecimal.ZERO) { "Parcel weight must be greater than zero" }
+
             val id = UUID.randomUUID()
             val now = Instant.now(clock)
 
@@ -108,6 +125,7 @@ class Parcel private constructor(
                             parcelId = id,
                             status = ParcelStatus.CREATED,
                             occurredAt = now,
+                            id = UUID.randomUUID(),
                         ),
                     ),
             )
@@ -122,8 +140,14 @@ class Parcel private constructor(
             createdAt: Instant,
             status: ParcelStatus,
             trackingEvents: List<TrackingEvent>,
-        ): Parcel =
-            Parcel(
+        ): Parcel {
+            require(trackingNumber.isNotBlank()) { "Tracking number must not be blank" }
+            require(weight > BigDecimal.ZERO) { "Parcel weight must be greater than zero" }
+            require(trackingEvents.all { it.parcelId == id }) {
+                "All tracking events must belong to the parcel"
+            }
+
+            return Parcel(
                 id = id,
                 trackingNumber = trackingNumber,
                 sender = sender,
@@ -133,5 +157,6 @@ class Parcel private constructor(
                 initialStatus = status,
                 initialTrackingEvents = trackingEvents,
             )
+        }
     }
 }

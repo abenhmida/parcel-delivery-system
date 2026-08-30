@@ -1,0 +1,13 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    password: ${DATABASE_USERNAME:parcel}
+    username: ${DATABASE_PASSWORD:parcel}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/parcel_delivery}
+
+  flyway:
+    enabled: true
+    locations:
+      - classpath:db/migration

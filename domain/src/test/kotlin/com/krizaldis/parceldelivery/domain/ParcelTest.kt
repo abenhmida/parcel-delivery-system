@@ -32,7 +32,7 @@ class ParcelTest {
     fun `created parcel can be picked up`() {
         val parcel = aParcel()
 
-        parcel.pickUp()
+        parcel.pickUp(clock)
 
         assertThat(parcel.status)
             .isEqualTo(ParcelStatus.PICKED_UP)
@@ -43,7 +43,7 @@ class ParcelTest {
         val parcel = aParcel()
 
         assertThatThrownBy {
-            parcel.deliver()
+            parcel.deliver(clock)
         }.isInstanceOf(IllegalStateException::class.java)
     }
 
@@ -51,19 +51,19 @@ class ParcelTest {
     fun `parcel can move through the complete successful lifecycle`() {
         val parcel = aParcel()
 
-        parcel.pickUp()
+        parcel.pickUp(clock)
         assertThat(parcel.status).isEqualTo(ParcelStatus.PICKED_UP)
 
-        parcel.arriveAtSortingCenter()
+        parcel.arriveAtSortingCenter(clock)
         assertThat(parcel.status).isEqualTo(ParcelStatus.AT_SORTING_CENTER)
 
-        parcel.dispatch()
+        parcel.dispatch(clock)
         assertThat(parcel.status).isEqualTo(ParcelStatus.IN_TRANSIT)
 
-        parcel.outForDelivery()
+        parcel.outForDelivery(clock)
         assertThat(parcel.status).isEqualTo(ParcelStatus.OUT_FOR_DELIVERY)
 
-        parcel.deliver()
+        parcel.deliver(clock)
         assertThat(parcel.status).isEqualTo(ParcelStatus.DELIVERED)
     }
 

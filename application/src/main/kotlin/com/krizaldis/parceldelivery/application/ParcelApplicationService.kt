@@ -28,7 +28,7 @@ class ParcelApplicationService(
                 clock = clock,
             )
 
-        parcelRepository.save(parcel)
+        parcelRepository.create(parcel)
 
         return parcel
     }
@@ -43,42 +43,42 @@ class ParcelApplicationService(
 
     fun pickUp(id: UUID): Parcel =
         transition(id) {
-            pickUp()
+            pickUp(clock)
         }
 
     fun arriveAtSortingCenter(id: UUID): Parcel =
         transition(id) {
-            arriveAtSortingCenter()
+            arriveAtSortingCenter(clock)
         }
 
     fun dispatch(id: UUID): Parcel =
         transition(id) {
-            dispatch()
+            dispatch(clock)
         }
 
     fun outForDelivery(id: UUID): Parcel =
         transition(id) {
-            outForDelivery()
+            outForDelivery(clock)
         }
 
     fun deliver(id: UUID): Parcel =
         transition(id) {
-            deliver()
+            deliver(clock)
         }
 
     fun deliveryFailed(id: UUID): Parcel =
         transition(id) {
-            deliveryFailed()
+            deliveryFailed(clock)
         }
 
     fun retryDelivery(id: UUID): Parcel =
         transition(id) {
-            retryDelivery()
+            retryDelivery(clock)
         }
 
     fun returnToSender(id: UUID): Parcel =
         transition(id) {
-            returnToSender()
+            returnToSender(clock)
         }
 
     private fun transition(

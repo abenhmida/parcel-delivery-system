@@ -9,16 +9,18 @@ import com.krizaldis.parceldelivery.infrastructure.database.jooq.tables.Parcels.
 import com.krizaldis.parceldelivery.infrastructure.database.jooq.tables.TrackingEvents.TRACKING_EVENTS
 import com.krizaldis.parceldelivery.infrastructure.database.jooq.tables.records.ParcelsRecord
 import org.jooq.DSLContext
+import org.jooq.Record
 import org.springframework.stereotype.Repository
 import java.time.OffsetDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.UUID
 
 @Repository
 class JooqParcelRepository(
     private val dsl: DSLContext,
 ) : ParcelRepository {
-    override fun save(parcel: Parcel) {
+    override fun create(parcel: Parcel) {
         dsl.transaction { configuration ->
             val txDsl = configuration.dsl()
 
@@ -63,17 +65,44 @@ class JooqParcelRepository(
         }
     }
 
-    override fun findById(id: UUID): Parcel? {
-        val parcelRecord =
-            dsl
-                .selectFrom(PARCELS)
-                .where(PARCELS.ID.eq(id))
-                .fetchOne() ?: return null
+    override fun update(parcel: Parcel) {
+        dsl.transaction { configuration ->
+            val tx = configuration.dsl()
 
-        val events = findTrackingEvents(id)
+            val updated =
+                tx
+                    .update(JooqSchema.PARCELS)
+                    .set(JooqSchema.STATUS, parcel.status.name)
+                    .where(JooqSchema.PARCEL_ID.eq(parcel.id))
+                    .execute()
 
-        return parcelRecord.toDomain(events)
+            check(updated == 1) {
+                "Parcel ${parcel.id} was not found during update"
+            }
+
+            insertEvent(tx, parcel.latestTrackingEvent())
+        }
     }
+
+    private fun insertEvent(
+        tx: DSLContext,
+        event: TrackingEvent,
+    ) {
+        tx
+            .insertInto(JooqSchema.TRACKING_EVENTS)
+            .set(JooqSchema.EVENT_ID, event.id)
+            .set(JooqSchema.EVENT_PARCEL_ID, event.parcelId)
+            .set(JooqSchema.EVENT_STATUS, event.status.name)
+            .set(JooqSchema.EVENT_OCCURRED_AT, event.occurredAt.atOffset(ZoneOffset.UTC))
+            .execute()
+    }
+
+    override fun findById(id: UUID): Parcel? =
+        dsl
+            .selectFrom(PARCELS)
+            .where(PARCELS.ID.eq(id))
+            .fetchOne()
+            ?.let(::toDomain)
 
     override fun findByTrackingNumber(trackingNumber: String): Parcel? {
         val parcelRecord =
@@ -99,6 +128,7 @@ class JooqParcelRepository(
                     parcelId = it.parcelId,
                     status = ParcelStatus.valueOf(it.status),
                     occurredAt = it.occurredAt.toInstant(),
+                    id = it.id,
                 )
             }
 
@@ -127,4 +157,47 @@ class JooqParcelRepository(
             status = ParcelStatus.valueOf(status),
             trackingEvents = events,
         )
+
+    private fun toDomain(record: Record): Parcel {
+        val id = record.get(JooqSchema.PARCEL_ID)!!
+        val events =
+            dsl
+                .selectFrom(JooqSchema.TRACKING_EVENTS)
+                .where(JooqSchema.EVENT_PARCEL_ID.eq(id))
+                .orderBy(JooqSchema.EVENT_OCCURRED_AT.asc())
+                .fetch()
+                .map {
+                    TrackingEvent(
+                        id = it.get(JooqSchema.EVENT_ID)!!,
+                        parcelId = it.get(JooqSchema.EVENT_PARCEL_ID)!!,
+                        status = ParcelStatus.valueOf(it.get(JooqSchema.EVENT_STATUS)!!),
+                        occurredAt = it.get(JooqSchema.EVENT_OCCURRED_AT)!!.toInstant(),
+                    )
+                }
+
+        return Parcel.restore(
+            id = id,
+            trackingNumber = record.get(JooqSchema.TRACKING_NUMBER)!!,
+            sender =
+                Address(
+                    name = record.get(JooqSchema.SENDER_NAME)!!,
+                    street = record.get(JooqSchema.SENDER_STREET)!!,
+                    city = record.get(JooqSchema.SENDER_CITY)!!,
+                    postalCode = record.get(JooqSchema.SENDER_POSTAL_CODE)!!,
+                    country = record.get(JooqSchema.SENDER_COUNTRY)!!,
+                ),
+            recipient =
+                Address(
+                    name = record.get(JooqSchema.RECIPIENT_NAME)!!,
+                    street = record.get(JooqSchema.RECIPIENT_STREET)!!,
+                    city = record.get(JooqSchema.RECIPIENT_CITY)!!,
+                    postalCode = record.get(JooqSchema.RECIPIENT_POSTAL_CODE)!!,
+                    country = record.get(JooqSchema.RECIPIENT_COUNTRY)!!,
+                ),
+            weight = record.get(JooqSchema.WEIGHT)!!,
+            createdAt = record.get(JooqSchema.CREATED_AT)!!.toInstant(),
+            status = ParcelStatus.valueOf(record.get(JooqSchema.STATUS)!!),
+            trackingEvents = events,
+        )
+    }
 }

@@ -4,20 +4,26 @@ import com.krizaldis.parceldelivery.application.ParcelApplicationService
 import com.krizaldis.parceldelivery.domain.ParcelRepository
 import com.krizaldis.parceldelivery.domain.RandomTrackingNumberGenerator
 import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
-import com.krizaldis.parceldelivery.infrastructure.configuration.DatabaseProperties
+import com.krizaldis.parceldelivery.infrastructure.database.DatabaseFactory
+import com.krizaldis.parceldelivery.infrastructure.database.DatabaseProperties
 import org.jooq.DSLContext
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.env.Environment
 import java.time.Clock
 import javax.sql.DataSource
 
 @Configuration
 class ParcelDeliveryConfiguration(
-    @field:Value("${'$'}{spring.datasource.url}") private val url: String,
-    @field:Value("${'$'}{spring.datasource.username}") private val username: String,
-    @field:Value("${'$'}{spring.datasource.password}") private val password: String,
+    @param:Value("\${spring.datasource.url}") private val url: String,
+    @param:Value("\${spring.datasource.username}") private val username: String,
+    @param:Value("\${spring.datasource.password}") private val password: String,
 ) {
+    @Autowired
+    lateinit var env: Environment
+
     @Bean
     fun databaseProperties() = DatabaseProperties(url, username, password)
 

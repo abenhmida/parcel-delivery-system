@@ -3,7 +3,7 @@ package com.krizaldis.parceldelivery.domain
 import java.util.UUID
 
 interface ParcelRepository {
-    fun save(parcel: Parcel)
+    fun create(parcel: Parcel)
 
     fun update(parcel: Parcel)
 
