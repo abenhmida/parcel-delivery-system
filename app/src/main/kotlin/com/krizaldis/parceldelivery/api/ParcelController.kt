@@ -18,7 +18,14 @@ class ParcelController(
     @PostMapping
     fun create(
         @RequestBody request: CreateParcelRequest,
-    ): ParcelResponse = ParcelResponse.from(parcelService.create(request))
+    ): ParcelResponse =
+        ParcelResponse.from(
+            parcelService.create(
+                sender = request.sender.toDomain(),
+                recipient = request.recipient.toDomain(),
+                weight = request.weight,
+            ),
+        )
 
     @GetMapping("/{id}")
     fun get(
