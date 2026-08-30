@@ -1,11 +1,11 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 spring:
   datasource:
-    password: parcel
-    username: parcel
-    url: jdbc:postgresql://localhost:5432/parcel_delivery
+    password: ${DATABASE_USERNAME:parcel}
+    username: ${DATABASE_PASSWORD:parcel}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/parcel_delivery}
 
   flyway:
     enabled: true

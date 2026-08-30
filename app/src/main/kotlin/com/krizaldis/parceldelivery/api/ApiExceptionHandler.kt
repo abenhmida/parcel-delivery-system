@@ -1,14 +1,20 @@
-package com.krizaldis.parceldelivery.rest
+package com.krizaldis.parceldelivery.api
 
 import com.krizaldis.parceldelivery.exceptions.ParcelNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class ApiExceptionHandler {
+    @ExceptionHandler(IllegalArgumentException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun invalidRequest(exception: IllegalArgumentException) = ApiError("INVALID_REQUEST", exception.message ?: "Invalid request")
+
     @ExceptionHandler(ParcelNotFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     fun notFound(exception: ParcelNotFoundException): ResponseEntity<ApiError> =
         ResponseEntity
             .status(HttpStatus.NOT_FOUND)
@@ -20,6 +26,7 @@ class ApiExceptionHandler {
             )
 
     @ExceptionHandler(IllegalStateException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
     fun invalidTransition(exception: IllegalStateException): ResponseEntity<ApiError> =
         ResponseEntity
             .badRequest()
@@ -30,8 +37,3 @@ class ApiExceptionHandler {
                 ),
             )
 }
-
-data class ApiError(
-    val code: String,
-    val message: String,
-)

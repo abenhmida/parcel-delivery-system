@@ -1,7 +1,5 @@
-package com.krizaldis.parceldelivery.rest
+package com.krizaldis.parceldelivery.api
 
-import com.krizaldis.parceldelivery.api.TrackingEventResponse
-import com.krizaldis.parceldelivery.api.TrackingResponse
 import com.krizaldis.parceldelivery.application.ParcelApplicationService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,6 +26,7 @@ class TrackingEventsController(
                     TrackingEventResponse(
                         status = it.status.name,
                         occurredAt = it.occurredAt,
+                        id = id,
                     )
                 },
         )

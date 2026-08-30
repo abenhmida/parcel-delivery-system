@@ -1,8 +1,5 @@
-package com.krizaldis.parceldelivery.rest
+package com.krizaldis.parceldelivery.api
 
-import com.krizaldis.parceldelivery.api.AddressDTO
-import com.krizaldis.parceldelivery.api.CreateParcelRequest
-import com.krizaldis.parceldelivery.api.ParcelResponse
 import com.krizaldis.parceldelivery.application.ParcelApplicationService
 import com.krizaldis.parceldelivery.domain.Address
 import org.springframework.web.bind.annotation.GetMapping
@@ -103,12 +100,3 @@ class ParcelController(
             parcelService.returnToSender(id),
         )
 }
-
-fun Address.Companion.from(address: AddressDTO): Address =
-    Address(
-        name = address.name,
-        street = address.street,
-        city = address.city,
-        postalCode = address.postalCode,
-        country = address.country,
-    )

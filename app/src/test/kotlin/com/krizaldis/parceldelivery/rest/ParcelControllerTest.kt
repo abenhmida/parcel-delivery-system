@@ -1,6 +1,6 @@
 package com.krizaldis.parceldelivery.rest
 
-import com.krizaldis.parceldelivery.api.AddressDTO
+import com.krizaldis.parceldelivery.api.AddressRequest
 import com.krizaldis.parceldelivery.api.CreateParcelRequest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -48,7 +48,7 @@ class ParcelControllerTest {
         val request =
             CreateParcelRequest(
                 sender =
-                    AddressDTO(
+                    AddressRequest(
                         name = "Alice Sender",
                         street = "Sender Street 1",
                         city = "Berlin",
@@ -56,7 +56,7 @@ class ParcelControllerTest {
                         country = "DE",
                     ),
                 recipient =
-                    AddressDTO(
+                    AddressRequest(
                         name = "Bob Receiver",
                         street = "Receiver Street 2",
                         city = "Munich",
@@ -99,7 +99,7 @@ class ParcelControllerTest {
         val request =
             CreateParcelRequest(
                 sender =
-                    AddressDTO(
+                    AddressRequest(
                         name = "Charlie Sender",
                         street = "Main St 10",
                         city = "Hamburg",
@@ -107,7 +107,7 @@ class ParcelControllerTest {
                         country = "DE",
                     ),
                 recipient =
-                    AddressDTO(
+                    AddressRequest(
                         name = "David Receiver",
                         street = "North St 20",
                         city = "Frankfurt",
@@ -151,7 +151,7 @@ class ParcelControllerTest {
         val request =
             CreateParcelRequest(
                 sender =
-                    AddressDTO(
+                    AddressRequest(
                         name = "Eve Sender",
                         street = "East St 5",
                         city = "Cologne",
@@ -159,7 +159,7 @@ class ParcelControllerTest {
                         country = "DE",
                     ),
                 recipient =
-                    AddressDTO(
+                    AddressRequest(
                         name = "Frank Receiver",
                         street = "West St 6",
                         city = "Dusseldorf",
@@ -212,7 +212,7 @@ class ParcelControllerTest {
         val request =
             CreateParcelRequest(
                 sender =
-                    AddressDTO(
+                    AddressRequest(
                         name = "Grace Sender",
                         street = "Grace St 1",
                         city = "Stuttgart",
@@ -220,7 +220,7 @@ class ParcelControllerTest {
                         country = "DE",
                     ),
                 recipient =
-                    AddressDTO(
+                    AddressRequest(
                         name = "Heidi Receiver",
                         street = "Heidi St 2",
                         city = "Nuremberg",

@@ -13,12 +13,16 @@ application {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":application"))
     implementation(project(":infrastructure"))
 
     implementation(libs.spring.boot.starter)
     implementation(libs.spring.boot.starter.web)
     implementation(libs.spring.boot.starter.jdbc)
+
     implementation(libs.jooq)
+
+    // implementation(libs.kotlin.reflect)
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.rest.assured)
