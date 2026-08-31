@@ -4,7 +4,7 @@
 [versions]
 kotlin = "2.2.20"
 
-spring-boot = "3.5.5"
+spring-boot = "4.0.8"
 spring-dependency-management = "1.1.7"
 
 assertj = "3.27.4"
@@ -13,6 +13,9 @@ junit-jupiter = "6.1.3"
 jooq = "3.20.6"
 flyway = "11.12.0"
 
+hikari = "7.0.2"
+kafkaVersion = "4.3.1"
+
 postgresql = "42.7.7"
 testcontainers = "1.20.5"
 rest-assured = "5.5.1"
@@ -20,21 +23,39 @@ rest-assured = "5.5.1"
 # Serialization
 jackson = "2.19.1"
 
+kotlinx-coroutines = "1.10.2"
+
 [libraries]
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-jupiter" }
 junit-platform-engine = { module = "org.junit.platform:junit-platform-engine", version.ref = "junit-jupiter" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 
-spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot"  }
-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot"  }
-spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "spring-boot"  }
-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" , version.ref = "spring-boot" }
-spring-boot-validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "spring-boot"  }
-spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "spring-boot"  }
+apache-kafka-clients = { module = "org.apache.kafka:kafka-clients", version.ref = "kafkaVersion" }
+apache-kafka-streams = { module = "org.apache.kafka:kafka-streams", version.ref = "kafkaVersion" }
+apache-kafka-server = { module = "org.apache.kafka:kafka-server", version.ref = "kafkaVersion" }
+apache-kafka-test-common-runtime = { module = "org.apache.kafka:kafka-test-common-runtime", version.ref = "kafkaVersion" }
+apache-kafka-metadata = { module = "org.apache.kafka:kafka-metadata", version.ref = "kafkaVersion" }
+apache-kafka-server-common = { module = "org.apache.kafka:kafka-server-common", version.ref = "kafkaVersion" }
+apache-kafka-streams-test-utils = { module = "org.apache.kafka:kafka-streams-test-utils", version.ref = "kafkaVersion" }
+
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
+spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "spring-boot" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
+spring-boot-validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "spring-boot" }
+spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "spring-boot" }
 spring-boot-jooq = { module = "org.springframework.boot:spring-boot-starter-jooq", version.ref = "spring-boot" }
-spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor", version.ref = "spring-boot"  }
-spring-context = { module = "org.springframework:spring-context", version.ref = "spring-boot"  }
+spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor", version.ref = "spring-boot" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test", version.ref = "spring-boot" }
+
+spring-kafka = { module = "org.springframework.kafka:spring-kafka" }
+spring-context = { module = "org.springframework:spring-context", version.ref = "spring-boot" }
+
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+
 
 jooq = { module = "org.jooq:jooq", version.ref = "jooq" }
 jooq-kotlin = { module = "org.jooq:jooq-kotlin", version.ref = "jooq" }
@@ -45,6 +66,7 @@ postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" 
 testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
 testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
 testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+testcontainers-kafka = { module = "org.testcontainers:kafka", version.ref = "testcontainers" }
 
 rest-assured = { module = "io.rest-assured:rest-assured", version.ref = "rest-assured" }
 rest-assured-kotlin-extensions = { module = "io.rest-assured:kotlin-extensions", version.ref = "rest-assured" }
@@ -55,6 +77,10 @@ flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql
 
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+
+hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

@@ -73,7 +73,7 @@ class ParcelControllerTest {
             .`when`()
             .post("/parcels")
             .then()
-            .statusCode(200)
+            .statusCode(201)
             .body("id", notNullValue())
             .body("tracking_number", notNullValue())
             .body("sender.name", equalTo("Alice Sender"))
@@ -125,7 +125,7 @@ class ParcelControllerTest {
                 .`when`()
                 .post("/parcels")
                 .then()
-                .statusCode(200)
+                .statusCode(201)
                 .extract()
                 .path("id")
 
@@ -177,7 +177,7 @@ class ParcelControllerTest {
                 .`when`()
                 .post("/parcels")
                 .then()
-                .statusCode(200)
+                .statusCode(201)
                 .extract()
                 .path("tracking_number")
 
@@ -238,7 +238,7 @@ class ParcelControllerTest {
                 .`when`()
                 .post("/parcels")
                 .then()
-                .statusCode(200)
+                .statusCode(201)
                 .extract()
                 .path("id")
 

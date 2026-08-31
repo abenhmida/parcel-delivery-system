@@ -1,6 +1,13 @@
 package com.krizaldis.parceldelivery.configuration
 
 import com.krizaldis.parceldelivery.application.ParcelApplicationService
+import com.krizaldis.parceldelivery.application.enrichment.AddressVerifier
+import com.krizaldis.parceldelivery.application.enrichment.DeliveryEstimator
+import com.krizaldis.parceldelivery.application.enrichment.ParcelEnrichmentApplicationService
+import com.krizaldis.parceldelivery.application.enrichment.RouteCalculator
+import com.krizaldis.parceldelivery.application.enrichment.SimulatedAddressVerifier
+import com.krizaldis.parceldelivery.application.enrichment.SimulatedDeliveryEstimator
+import com.krizaldis.parceldelivery.application.enrichment.SimulatedRouteCalculator
 import com.krizaldis.parceldelivery.domain.ParcelRepository
 import com.krizaldis.parceldelivery.domain.RandomTrackingNumberGenerator
 import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
@@ -54,4 +61,26 @@ class ParcelDeliveryConfiguration(
 
     @Bean
     fun trackingNumberGenerator(): TrackingNumberGenerator = RandomTrackingNumberGenerator()
+
+    @Bean
+    fun addressVerifier(): AddressVerifier = SimulatedAddressVerifier()
+
+    @Bean
+    fun routeCalculator(): RouteCalculator = SimulatedRouteCalculator()
+
+    @Bean
+    fun deliveryEstimator(clock: Clock): DeliveryEstimator = SimulatedDeliveryEstimator(clock = clock)
+
+    @Bean
+    fun parcelEnrichmentApplicationService(
+        parcelApplicationService: ParcelApplicationService,
+        addressVerifier: AddressVerifier,
+        routeCalculator: RouteCalculator,
+        deliveryEstimator: DeliveryEstimator,
+    ) = ParcelEnrichmentApplicationService(
+        parcelService = parcelApplicationService,
+        addressVerifier = addressVerifier,
+        routeCalculator = routeCalculator,
+        deliveryEstimator = deliveryEstimator,
+    )
 }

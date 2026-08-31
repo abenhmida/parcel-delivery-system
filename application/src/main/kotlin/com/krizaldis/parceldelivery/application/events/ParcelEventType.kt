@@ -1,0 +1,13 @@
+package com.krizaldis.parceldelivery.application.events
+
+enum class ParcelEventType {
+    PARCEL_CREATED,
+    PARCEL_PICKED_UP,
+    PARCEL_AT_SORTING_CENTER,
+    PARCEL_DISPATCHED,
+    PARCEL_OUT_FOR_DELIVERY,
+    PARCEL_DELIVERED,
+    PARCEL_DELIVERY_FAILED,
+    PARCEL_DELIVERY_RETRIED,
+    PARCEL_RETURNED,
+}
