@@ -12,11 +12,11 @@ import java.time.Clock
 import java.util.UUID
 
 class ParcelApplicationService(
+    private val persistence: ParcelPersistence,
     private val parcelRepository: ParcelRepository,
     private val trackingNumberGenerator: TrackingNumberGenerator,
     private val clock: Clock,
     private val eventFactory: ParcelEventFactory,
-    private val eventPublisher: ParcelEventPublisher,
 ) {
     fun create(
         sender: Address,
@@ -32,9 +32,13 @@ class ParcelApplicationService(
                 clock = clock,
             )
 
-        parcelRepository.create(parcel)
+        val event =
+            eventFactory.create(parcel)
 
-        eventPublisher.publish(eventFactory.create(parcel))
+        persistence.create(
+            parcel = parcel,
+            event = event,
+        )
 
         return parcel
     }
@@ -100,9 +104,13 @@ class ParcelApplicationService(
             "A successful parcel transition must create exactly one tracking event"
         }
 
-        parcelRepository.update(parcel)
+        val event =
+            eventFactory.create(parcel)
 
-        eventPublisher.publish(eventFactory.create(parcel))
+        persistence.update(
+            parcel = parcel,
+            event = event,
+        )
 
         return parcel
     }

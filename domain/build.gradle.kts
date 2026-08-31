@@ -6,4 +6,7 @@ dependencies {
     implementation(libs.kotlin.logging.jvm)
     implementation(libs.logback.classic)
     testImplementation(libs.mockito.kotlin)
+
+    implementation(libs.kotlinx.coroutines.core)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

@@ -70,4 +70,55 @@ object JooqSchema {
             DSL.name("received_at"),
             OffsetDateTime::class.java,
         )
+
+    val OUTBOX_MESSAGES: Table<*> =
+        DSL.table(DSL.name("outbox_messages"))
+
+    val OUTBOX_ID: Field<UUID> =
+        DSL.field(
+            DSL.name("id"),
+            UUID::class.java,
+        )
+
+    val OUTBOX_AGGREGATE_ID: Field<UUID> =
+        DSL.field(
+            DSL.name("aggregate_id"),
+            UUID::class.java,
+        )
+
+    val OUTBOX_EVENT_TYPE: Field<String> =
+        DSL.field(
+            DSL.name("event_type"),
+            String::class.java,
+        )
+
+    val OUTBOX_PAYLOAD: Field<String> =
+        DSL.field(
+            DSL.name("payload"),
+            String::class.java,
+        )
+
+    val OUTBOX_CREATED_AT: Field<OffsetDateTime> =
+        DSL.field(
+            DSL.name("created_at"),
+            OffsetDateTime::class.java,
+        )
+
+    val OUTBOX_PUBLISHED_AT: Field<OffsetDateTime> =
+        DSL.field(
+            DSL.name("published_at"),
+            OffsetDateTime::class.java,
+        )
+
+    val OUTBOX_ATTEMPTS: Field<Int> =
+        DSL.field(
+            DSL.name("attempts"),
+            Int::class.java,
+        )
+
+    val OUTBOX_LAST_ERROR: Field<String> =
+        DSL.field(
+            DSL.name("last_error"),
+            String::class.java,
+        )
 }

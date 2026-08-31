@@ -1,5 +1,6 @@
 package com.krizaldis.parceldelivery.events
 
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.times
@@ -10,27 +11,28 @@ import java.util.UUID
 
 class PersistingParcelEventHandlerTest {
     @Test
-    fun `duplicate event is ignored`() {
-        val repository = mock<ParcelEventReceiptRepository>()
+    fun `duplicate event is ignored`() =
+        runTest {
+            val repository = mock<ParcelEventReceiptRepository>()
 
-        val event =
-            ParcelEvent(
-                eventId = UUID.randomUUID(),
-                parcelId = UUID.randomUUID(),
-                trackingNumber = "PD-123",
-                type = ParcelEventType.PARCEL_DELIVERED,
-                occurredAt = Instant.now(),
-            )
+            val event =
+                ParcelEvent(
+                    eventId = UUID.randomUUID(),
+                    parcelId = UUID.randomUUID(),
+                    trackingNumber = "PD-123",
+                    type = ParcelEventType.PARCEL_DELIVERED,
+                    occurredAt = Instant.now(),
+                )
 
-        whenever { repository.record(event) }
-            .thenReturn(false)
+            whenever { repository.record(event) }
+                .thenReturn(false)
 
-        val handler =
-            PersistingParcelEventHandler(repository)
+            val handler =
+                PersistingParcelEventHandler(repository)
 
-        handler.handle(event)
+            handler.handle(event)
 
-        verify(repository, times(1))
-            .record(event)
-    }
+            verify(repository, times(1))
+                .record(event)
+        }
 }

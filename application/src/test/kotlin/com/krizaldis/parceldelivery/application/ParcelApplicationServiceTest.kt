@@ -4,11 +4,15 @@ import com.krizaldis.parceldelivery.domain.Address
 import com.krizaldis.parceldelivery.domain.Parcel
 import com.krizaldis.parceldelivery.domain.ParcelRepository
 import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
-import com.krizaldis.parceldelivery.events.ParcelEvent
 import com.krizaldis.parceldelivery.events.ParcelEventFactory
-import com.krizaldis.parceldelivery.events.ParcelEventPublisher
+import com.krizaldis.parceldelivery.events.ParcelEventType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.check
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.math.BigDecimal
 import java.time.Clock
 import java.time.Instant
@@ -23,11 +27,8 @@ class ParcelApplicationServiceTest {
         )
     private val repository = InMemoryParcelRepository()
     private val eventFactory = ParcelEventFactory()
-    private val eventPublisher =
-        object : ParcelEventPublisher {
-            override fun publish(event: ParcelEvent) {
-            }
-        }
+    private val persistence = mock<ParcelPersistence>()
+
     private val service =
         ParcelApplicationService(
             parcelRepository = repository,
@@ -37,14 +38,23 @@ class ParcelApplicationServiceTest {
                 },
             clock = clock,
             eventFactory = eventFactory,
-            eventPublisher = eventPublisher,
+            persistence = persistence,
         )
 
     @Test
     fun `create persists parcel`() {
         val parcel = service.create(address(), address(), BigDecimal("2.5"))
 
-        assertThat(repository.findById(parcel.id)).isNotNull
+        verify(persistence).create(
+            any(),
+            check {
+                assertThat(it.type)
+                    .isEqualTo(
+                        ParcelEventType.PARCEL_CREATED,
+                    )
+            },
+        )
+
         assertThat(parcel.trackingNumber).isEqualTo("PD-TEST123")
     }
 
@@ -52,10 +62,19 @@ class ParcelApplicationServiceTest {
     fun `transition updates persisted state`() {
         val parcel = service.create(address(), address(), BigDecimal("2.5"))
 
+        repository.create(parcel)
+
         service.pickUp(parcel.id)
 
-        assertThat(repository.findById(parcel.id)!!.status.name)
-            .isEqualTo("PICKED_UP")
+        verify(persistence).update(
+            any(),
+            check {
+                assertThat(it.type)
+                    .isEqualTo(
+                        ParcelEventType.PARCEL_PICKED_UP,
+                    )
+            },
+        )
     }
 
     private fun address() =

@@ -7,7 +7,7 @@ private val logger = KotlinLogging.logger {}
 class PersistingParcelEventHandler(
     private val receiptRepository: ParcelEventReceiptRepository,
 ) : ParcelEventHandler {
-    override fun handle(event: ParcelEvent) {
+    override suspend fun handle(event: ParcelEvent) {
         val inserted = receiptRepository.record(event)
 
         if (inserted) {

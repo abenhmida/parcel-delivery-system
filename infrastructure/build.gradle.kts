@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":application"))
 
     implementation(libs.jooq)
     implementation(libs.jooq.kotlin)
@@ -21,6 +22,9 @@ dependencies {
     implementation(libs.flyway.database.postgresql)
 
     implementation(libs.kotlin.logging.jvm)
+
+    implementation(libs.kotlinx.coroutines.core)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     implementation(libs.jackson.datatype.jsr310)
     implementation(libs.jackson.module.kotlin)

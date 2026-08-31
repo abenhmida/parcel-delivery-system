@@ -1,6 +1,7 @@
 package com.krizaldis.parceldelivery.configuration
 
 import com.krizaldis.parceldelivery.application.ParcelApplicationService
+import com.krizaldis.parceldelivery.application.ParcelPersistence
 import com.krizaldis.parceldelivery.application.enrichment.AddressVerifier
 import com.krizaldis.parceldelivery.application.enrichment.DeliveryEstimator
 import com.krizaldis.parceldelivery.application.enrichment.ParcelEnrichmentApplicationService
@@ -8,18 +9,19 @@ import com.krizaldis.parceldelivery.application.enrichment.RouteCalculator
 import com.krizaldis.parceldelivery.application.enrichment.SimulatedAddressVerifier
 import com.krizaldis.parceldelivery.application.enrichment.SimulatedDeliveryEstimator
 import com.krizaldis.parceldelivery.application.enrichment.SimulatedRouteCalculator
+import com.krizaldis.parceldelivery.application.outbox.OutboxRepository
 import com.krizaldis.parceldelivery.domain.ParcelRepository
 import com.krizaldis.parceldelivery.domain.RandomTrackingNumberGenerator
 import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
 import com.krizaldis.parceldelivery.events.ParcelEvent
 import com.krizaldis.parceldelivery.events.ParcelEventFactory
 import com.krizaldis.parceldelivery.events.ParcelEventHandler
-import com.krizaldis.parceldelivery.events.ParcelEventPublisher
 import com.krizaldis.parceldelivery.events.ParcelEventReceiptRepository
+import com.krizaldis.parceldelivery.events.ParcelEventSerializer
 import com.krizaldis.parceldelivery.events.PersistingParcelEventHandler
 import com.krizaldis.parceldelivery.infrastructure.database.DatabaseFactory
 import com.krizaldis.parceldelivery.infrastructure.database.DatabaseProperties
-import com.krizaldis.parceldelivery.infrastructure.kafka.KafkaParcelEventPublisher
+import com.krizaldis.parceldelivery.infrastructure.kafka.OutboxPublisher
 import com.krizaldis.parceldelivery.infrastructure.kafka.ParcelEventConsumer
 import org.flywaydb.core.Flyway
 import org.jooq.DSLContext
@@ -58,14 +60,14 @@ class ParcelDeliveryConfiguration(
         trackingNumberGenerator: TrackingNumberGenerator,
         clock: Clock,
         eventFactory: ParcelEventFactory,
-        eventPublisher: ParcelEventPublisher,
+        persistence: ParcelPersistence,
     ): ParcelApplicationService =
         ParcelApplicationService(
             parcelRepository = parcelRepository,
             trackingNumberGenerator = trackingNumberGenerator,
             clock = clock,
             eventFactory = eventFactory,
-            eventPublisher = eventPublisher,
+            persistence = persistence,
         )
 
     @Bean
@@ -94,10 +96,20 @@ class ParcelDeliveryConfiguration(
     )
 
     @Bean
-    fun parcelEventFactory(): ParcelEventFactory = ParcelEventFactory()
+    fun outboxPublisher(
+        outboxRepository: OutboxRepository,
+        serializer: ParcelEventSerializer,
+        kafkaTemplate: KafkaTemplate<String, ParcelEvent>,
+    ): OutboxPublisher =
+        OutboxPublisher(
+            outboxRepository = outboxRepository,
+            serializer = serializer,
+            kafkaTemplate = kafkaTemplate,
+            topic = topic,
+        )
 
     @Bean
-    fun kafkaParcelEventPublisher(kafkaTemplate: KafkaTemplate<String, ParcelEvent>) = KafkaParcelEventPublisher(kafkaTemplate, topic)
+    fun parcelEventFactory(): ParcelEventFactory = ParcelEventFactory()
 
     @Bean
     fun persistingParcelEventHandler(receiptRepository: ParcelEventReceiptRepository): ParcelEventHandler =

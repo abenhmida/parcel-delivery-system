@@ -47,6 +47,7 @@ apache-kafka-metadata = { module = "org.apache.kafka:kafka-metadata", version.re
 apache-kafka-server-common = { module = "org.apache.kafka:kafka-server-common", version.ref = "kafkaVersion" }
 apache-kafka-streams-test-utils = { module = "org.apache.kafka:kafka-streams-test-utils", version.ref = "kafkaVersion" }
 
+spring-boot-starter-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway", version.ref = "spring-boot" }
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
 spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref = "spring-boot" }

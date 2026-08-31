@@ -18,8 +18,6 @@ import org.testcontainers.kafka.KafkaContainer
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
-import kotlin.jvm.java
-import kotlin.to
 
 @Testcontainers
 class KafkaParcelEventIntegrationTest {

@@ -1,7 +1,14 @@
 package com.krizaldis.parceldelivery.configuration
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.krizaldis.parceldelivery.events.ParcelEvent
+import com.krizaldis.parceldelivery.events.ParcelEventSerializer
+import com.krizaldis.parceldelivery.infrastructure.kafka.JacksonParcelEventSerializer
 import org.apache.kafka.clients.admin.NewTopic
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -58,5 +65,20 @@ class KafkaConfiguration(
             this.setConsumerFactory(consumerFactory)
             this.setConcurrency(3)
         }
+    }
+
+    @Bean
+    fun jacksonParcelEventSerializer(objectMapper: ObjectMapper): ParcelEventSerializer = JacksonParcelEventSerializer(objectMapper)
+
+    @Bean
+    fun objectMapper(): ObjectMapper = ObjectMapperFactory.create()
+
+    object ObjectMapperFactory {
+        fun create(): ObjectMapper =
+            ObjectMapper()
+                .registerModule(KotlinModule.Builder().build())
+                .registerModule(JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
     }
 }
