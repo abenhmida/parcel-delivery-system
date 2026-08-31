@@ -13,6 +13,7 @@ import com.krizaldis.parceldelivery.domain.RandomTrackingNumberGenerator
 import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
 import com.krizaldis.parceldelivery.infrastructure.database.DatabaseFactory
 import com.krizaldis.parceldelivery.infrastructure.database.DatabaseProperties
+import org.flywaydb.core.Flyway
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -34,15 +35,17 @@ class ParcelDeliveryConfiguration(
     @Bean
     fun databaseProperties() = DatabaseProperties(url, username, password)
 
-    @Bean(destroyMethod = "close")
-    fun dataSource(properties: DatabaseProperties): DataSource {
-        val dataSource = DatabaseFactory.createDataSource(properties)
-        DatabaseFactory.migrate(dataSource)
-        return dataSource
-    }
+    @Bean
+    fun dataSource(properties: DatabaseProperties): DataSource = DatabaseFactory.createDataSource(properties)
 
     @Bean
-    fun dslContext(dataSource: DataSource): DSLContext = DatabaseFactory.createDsl(dataSource)
+    fun flyway(dataSource: DataSource): Flyway = DatabaseFactory.migrate(dataSource)
+
+    @Bean
+    fun dslContext(
+        dataSource: DataSource,
+        flyway: Flyway,
+    ): DSLContext = DatabaseFactory.createDsl(dataSource)
 
     @Bean
     fun clock(): Clock = Clock.systemUTC()

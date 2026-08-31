@@ -131,7 +131,6 @@ class ParcelControllerTest {
 
         RestAssured
             .given()
-            .contentType(ContentType.JSON)
             .`when`()
             .get("/parcels/{id}", createdParcelId)
             .then()
@@ -183,7 +182,6 @@ class ParcelControllerTest {
 
         RestAssured
             .given()
-            .contentType(ContentType.JSON)
             .`when`()
             .get("/parcels/tracking/{trackingNumber}", trackingNumber)
             .then()
@@ -198,7 +196,6 @@ class ParcelControllerTest {
     fun `should return 404 when parcel not found by tracking number`() {
         RestAssured
             .given()
-            .contentType(ContentType.JSON)
             .`when`()
             .get("/parcels/tracking/{trackingNumber}", "NON-EXISTENT-TRK")
             .then()
@@ -308,7 +305,6 @@ class ParcelControllerTest {
 
         RestAssured
             .given()
-            .contentType(ContentType.JSON)
             .`when`()
             .get("/parcels/{id}", nonExistentId)
             .then()
@@ -321,7 +317,6 @@ class ParcelControllerTest {
     fun `should return 400 when parcel id is invalid UUID`() {
         RestAssured
             .given()
-            .contentType(ContentType.JSON)
             .`when`()
             .get("/parcels/{id}", "invalid-uuid-string")
             .then()

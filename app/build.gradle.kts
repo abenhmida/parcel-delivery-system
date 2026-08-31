@@ -7,6 +7,8 @@ plugins {
     application
 }
 
+extra["groovy.version"] = "4.0.24"
+
 application {
     mainClass = "com.krizaldis.parceldelivery.ParcelDeliveryApplicationKt"
 }

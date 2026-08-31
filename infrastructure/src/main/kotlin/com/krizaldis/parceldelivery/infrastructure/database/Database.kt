@@ -28,12 +28,13 @@ object DatabaseFactory {
 
     fun createDsl(dataSource: DataSource): DSLContext = DSL.using(dataSource, SQLDialect.POSTGRES)
 
-    fun migrate(dataSource: DataSource) {
+    fun migrate(dataSource: DataSource): Flyway =
         Flyway
             .configure()
             .dataSource(dataSource)
             .locations("classpath:db/migration")
             .load()
-            .migrate()
-    }
+            .apply {
+                migrate()
+            }
 }
