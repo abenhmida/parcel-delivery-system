@@ -5,6 +5,8 @@ import com.krizaldis.parceldelivery.domain.Address
 import com.krizaldis.parceldelivery.domain.Parcel
 import com.krizaldis.parceldelivery.domain.ParcelRepository
 import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
+import com.krizaldis.parceldelivery.events.ParcelEventFactory
+import com.krizaldis.parceldelivery.events.ParcelEventPublisher
 import java.math.BigDecimal
 import java.time.Clock
 import java.util.UUID
@@ -13,6 +15,8 @@ class ParcelApplicationService(
     private val parcelRepository: ParcelRepository,
     private val trackingNumberGenerator: TrackingNumberGenerator,
     private val clock: Clock,
+    private val eventFactory: ParcelEventFactory,
+    private val eventPublisher: ParcelEventPublisher,
 ) {
     fun create(
         sender: Address,
@@ -29,6 +33,8 @@ class ParcelApplicationService(
             )
 
         parcelRepository.create(parcel)
+
+        eventPublisher.publish(eventFactory.create(parcel))
 
         return parcel
     }
@@ -95,6 +101,8 @@ class ParcelApplicationService(
         }
 
         parcelRepository.update(parcel)
+
+        eventPublisher.publish(eventFactory.create(parcel))
 
         return parcel
     }

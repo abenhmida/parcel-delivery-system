@@ -1,8 +1,7 @@
-package com.krizaldis.parceldelivery.kafka
+package com.krizaldis.parceldelivery.configuration
 
 import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.JsonSerializer
-import com.krizaldis.parceldelivery.application.events.ParcelEvent
+import com.krizaldis.parceldelivery.events.ParcelEvent
 import org.apache.kafka.clients.admin.NewTopic
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -15,6 +14,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
+import org.springframework.kafka.support.serializer.JsonSerializer
 
 @Configuration
 class KafkaConfiguration(

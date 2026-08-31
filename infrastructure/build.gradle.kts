@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.jooq.codegen)
+    alias(libs.plugins.spring.dependency.management)
 }
 
 dependencies {
@@ -14,11 +15,19 @@ dependencies {
     implementation(libs.spring.context)
     implementation(libs.spring.boot.jooq)
     implementation(libs.jooq.kotlin)
+    implementation(libs.spring.kafka)
 
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
 
+    implementation(libs.kotlin.logging.jvm)
+
+    implementation(libs.jackson.datatype.jsr310)
+    implementation(libs.jackson.module.kotlin)
+
     runtimeOnly(libs.postgresql)
+    runtimeOnly(libs.logback.classic)
+
     jooqCodegen(libs.postgresql)
     jooqCodegen(libs.jooqMetaExtensions)
 
@@ -26,7 +35,9 @@ dependencies {
     testImplementation(libs.testcontainers)
     testImplementation(libs.testcontainers.junit.jupiter)
     testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.kafka)
     testImplementation(libs.postgresql)
+    testImplementation(libs.mockito.kotlin)
 }
 
 jooq {

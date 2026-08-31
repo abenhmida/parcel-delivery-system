@@ -4,6 +4,9 @@ import com.krizaldis.parceldelivery.domain.Address
 import com.krizaldis.parceldelivery.domain.Parcel
 import com.krizaldis.parceldelivery.domain.ParcelRepository
 import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
+import com.krizaldis.parceldelivery.events.ParcelEvent
+import com.krizaldis.parceldelivery.events.ParcelEventFactory
+import com.krizaldis.parceldelivery.events.ParcelEventPublisher
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -19,6 +22,12 @@ class ParcelApplicationServiceTest {
             ZoneOffset.UTC,
         )
     private val repository = InMemoryParcelRepository()
+    private val eventFactory = ParcelEventFactory()
+    private val eventPublisher =
+        object : ParcelEventPublisher {
+            override fun publish(event: ParcelEvent) {
+            }
+        }
     private val service =
         ParcelApplicationService(
             parcelRepository = repository,
@@ -27,6 +36,8 @@ class ParcelApplicationServiceTest {
                     override fun generate() = "PD-TEST123"
                 },
             clock = clock,
+            eventFactory = eventFactory,
+            eventPublisher = eventPublisher,
         )
 
     @Test

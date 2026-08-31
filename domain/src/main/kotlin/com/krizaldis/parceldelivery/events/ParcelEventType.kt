@@ -1,4 +1,4 @@
-package com.krizaldis.parceldelivery.application.events
+package com.krizaldis.parceldelivery.events
 
 enum class ParcelEventType {
     PARCEL_CREATED,

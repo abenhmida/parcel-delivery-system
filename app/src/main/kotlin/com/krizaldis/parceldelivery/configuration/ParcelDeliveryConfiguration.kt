@@ -11,15 +11,22 @@ import com.krizaldis.parceldelivery.application.enrichment.SimulatedRouteCalcula
 import com.krizaldis.parceldelivery.domain.ParcelRepository
 import com.krizaldis.parceldelivery.domain.RandomTrackingNumberGenerator
 import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
+import com.krizaldis.parceldelivery.events.ParcelEvent
+import com.krizaldis.parceldelivery.events.ParcelEventFactory
+import com.krizaldis.parceldelivery.events.ParcelEventHandler
+import com.krizaldis.parceldelivery.events.ParcelEventPublisher
+import com.krizaldis.parceldelivery.events.ParcelEventReceiptRepository
+import com.krizaldis.parceldelivery.events.PersistingParcelEventHandler
 import com.krizaldis.parceldelivery.infrastructure.database.DatabaseFactory
 import com.krizaldis.parceldelivery.infrastructure.database.DatabaseProperties
+import com.krizaldis.parceldelivery.infrastructure.kafka.KafkaParcelEventPublisher
+import com.krizaldis.parceldelivery.infrastructure.kafka.ParcelEventConsumer
 import org.flywaydb.core.Flyway
 import org.jooq.DSLContext
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.env.Environment
+import org.springframework.kafka.core.KafkaTemplate
 import java.time.Clock
 import javax.sql.DataSource
 
@@ -28,10 +35,8 @@ class ParcelDeliveryConfiguration(
     @param:Value("\${spring.datasource.url}") private val url: String,
     @param:Value("\${spring.datasource.username}") private val username: String,
     @param:Value("\${spring.datasource.password}") private val password: String,
+    @param:Value("\${parcel.kafka.topic}") private val topic: String,
 ) {
-    @Autowired
-    lateinit var env: Environment
-
     @Bean
     fun databaseProperties() = DatabaseProperties(url, username, password)
 
@@ -42,10 +47,7 @@ class ParcelDeliveryConfiguration(
     fun flyway(dataSource: DataSource): Flyway = DatabaseFactory.migrate(dataSource)
 
     @Bean
-    fun dslContext(
-        dataSource: DataSource,
-        flyway: Flyway,
-    ): DSLContext = DatabaseFactory.createDsl(dataSource)
+    fun dslContext(dataSource: DataSource): DSLContext = DatabaseFactory.createDsl(dataSource)
 
     @Bean
     fun clock(): Clock = Clock.systemUTC()
@@ -55,11 +57,15 @@ class ParcelDeliveryConfiguration(
         parcelRepository: ParcelRepository,
         trackingNumberGenerator: TrackingNumberGenerator,
         clock: Clock,
+        eventFactory: ParcelEventFactory,
+        eventPublisher: ParcelEventPublisher,
     ): ParcelApplicationService =
         ParcelApplicationService(
             parcelRepository = parcelRepository,
             trackingNumberGenerator = trackingNumberGenerator,
             clock = clock,
+            eventFactory = eventFactory,
+            eventPublisher = eventPublisher,
         )
 
     @Bean
@@ -86,4 +92,17 @@ class ParcelDeliveryConfiguration(
         routeCalculator = routeCalculator,
         deliveryEstimator = deliveryEstimator,
     )
+
+    @Bean
+    fun parcelEventFactory(): ParcelEventFactory = ParcelEventFactory()
+
+    @Bean
+    fun kafkaParcelEventPublisher(kafkaTemplate: KafkaTemplate<String, ParcelEvent>) = KafkaParcelEventPublisher(kafkaTemplate, topic)
+
+    @Bean
+    fun persistingParcelEventHandler(receiptRepository: ParcelEventReceiptRepository): ParcelEventHandler =
+        PersistingParcelEventHandler(receiptRepository)
+
+    @Bean
+    fun parcelEventConsumer(parcelEventHandler: ParcelEventHandler): ParcelEventConsumer = ParcelEventConsumer(parcelEventHandler)
 }

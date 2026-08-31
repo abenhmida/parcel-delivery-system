@@ -1,0 +1,29 @@
+curl -X POST http://localhost:8080/parcels \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sender": {
+      "name": "Alice Sender",
+      "street": "Sender Street 1",
+      "city": "Berlin",
+      "postal_code": "10115",
+      "country": "DE"
+    },
+    "recipient": {
+      "name": "Bob Receiver",
+      "street": "Receiver Street 2",
+      "city": "Munich",
+      "postal_code": "80331",
+      "country": "DE"
+    },
+    "weight": 2.500
+  }'
+
+  {"id":"fc55860b-1ab2-452f-ac65-bf189dab85dc","tracking_number":"PD8ADE76504A844FDB8C7EC1","status":"CREATED","sender":{"name":"Alice Sender","street":"Sender Street 1","city":"Berlin","postal_code":"10115","country":"DE"},"recipient":{"name":"Bob Receiver","street":"Receiver Street 2","city":"Munich","postal_code":"80331","country":"DE"},"weight":2.500,"created_at":"2026-08-31T10:31:44.919274793Z"}
+
+  curl -X POST http://localhost:8080/parcels/fc55860b-1ab2-452f-ac65-bf189dab85dc/pickup
+
+  {"id":"fc55860b-1ab2-452f-ac65-bf189dab85dc","tracking_number":"PD8ADE76504A844FDB8C7EC1","status":"PICKED_UP","sender":{"name":"Alice Sender","street":"Sender Street 1","city":"Berlin","postal_code":"10115","country":"DE"},"recipient":{"name":"Bob Receiver","street":"Receiver Street 2","city":"Munich","postal_code":"80331","country":"DE"},"weight":2.500,"created_at":"2026-08-31T10:31:44.919275Z"}%
+
+  curl -X POST http://localhost:8080/parcels/fc55860b-1ab2-452f-ac65-bf189dab85dc/sorting
+
+  {"id":"fc55860b-1ab2-452f-ac65-bf189dab85dc","tracking_number":"PD8ADE76504A844FDB8C7EC1","status":"AT_SORTING_CENTER","sender":{"name":"Alice Sender","street":"Sender Street 1","city":"Berlin","postal_code":"10115","country":"DE"},"recipient":{"name":"Bob Receiver","street":"Receiver Street 2","city":"Munich","postal_code":"80331","country":"DE"},"weight":2.500,"created_at":"2026-08-31T10:31:44.919275Z"}%

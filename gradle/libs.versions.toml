@@ -14,7 +14,7 @@ jooq = "3.20.6"
 flyway = "11.12.0"
 
 hikari = "7.0.2"
-kafkaVersion = "4.3.1"
+kafkaVersion = "4.1.1"
 
 postgresql = "42.7.7"
 testcontainers = "1.20.5"
@@ -25,11 +25,19 @@ jackson = "2.19.1"
 
 kotlinx-coroutines = "1.10.2"
 
+kotlin-loggin = "7.0.3"
+logback = "1.6.3"
+
+mockito ="6.3.0"
+
 [libraries]
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-jupiter" }
 junit-platform-engine = { module = "org.junit.platform:junit-platform-engine", version.ref = "junit-jupiter" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito" }
+
+
 
 apache-kafka-clients = { module = "org.apache.kafka:kafka-clients", version.ref = "kafkaVersion" }
 apache-kafka-streams = { module = "org.apache.kafka:kafka-streams", version.ref = "kafkaVersion" }
@@ -49,13 +57,15 @@ spring-boot-jooq = { module = "org.springframework.boot:spring-boot-starter-jooq
 spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor", version.ref = "spring-boot" }
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test", version.ref = "spring-boot" }
 
-spring-kafka = { module = "org.springframework.kafka:spring-kafka" }
-spring-context = { module = "org.springframework:spring-context", version.ref = "spring-boot" }
+spring-kafka = { module = "org.springframework.kafka:spring-kafka", version.ref = "kafkaVersion" }
+spring-context = { module = "org.springframework:spring-context" }
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 
+kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlin-loggin" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 jooq = { module = "org.jooq:jooq", version.ref = "jooq" }
 jooq-kotlin = { module = "org.jooq:jooq-kotlin", version.ref = "jooq" }

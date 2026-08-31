@@ -1,4 +1,4 @@
-package com.krizaldis.parceldelivery.application.events
+package com.krizaldis.parceldelivery.events
 
 import com.krizaldis.parceldelivery.domain.Parcel
 import com.krizaldis.parceldelivery.domain.ParcelStatus
