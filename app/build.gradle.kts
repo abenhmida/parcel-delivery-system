@@ -38,6 +38,10 @@ dependencies {
     // implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
 
+    implementation(libs.micrometerCore)
+    implementation(libs.otel.exporter.otlp)
+    implementation(libs.micrometer.registry.prometheus)
+
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.spring.boot.starter.webmvc.test)
     testImplementation(libs.spring.kafka.test)
