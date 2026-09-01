@@ -26,7 +26,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     testImplementation(libs.kotlinx.coroutines.test)
 
-    implementation(libs.jackson.datatype.jsr310)
+    // implementation(libs.jackson.datatype.jsr310)
     implementation(libs.jackson.module.kotlin)
 
     runtimeOnly(libs.postgresql)

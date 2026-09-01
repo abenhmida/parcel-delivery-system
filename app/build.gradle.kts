@@ -56,8 +56,8 @@ dependencies {
     implementation(libs.flyway.core)
     implementation(libs.flyway.database.postgresql)
 
-    implementation(libs.jackson.datatype.jsr310)
     implementation(libs.jackson.module.kotlin)
+    // implementation(libs.jackson.module.kotlin)
 
     runtimeOnly(libs.postgresql)
 }

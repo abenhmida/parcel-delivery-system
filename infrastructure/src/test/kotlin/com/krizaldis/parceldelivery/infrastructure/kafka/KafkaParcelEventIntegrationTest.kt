@@ -10,14 +10,15 @@ import org.junit.jupiter.api.Test
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.support.serializer.JsonDeserializer
-import org.springframework.kafka.support.serializer.JsonSerializer
+import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+import org.springframework.kafka.support.serializer.JacksonJsonSerializer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.kafka.KafkaContainer
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
+import kotlin.to
 
 @Testcontainers
 class KafkaParcelEventIntegrationTest {
@@ -36,7 +37,7 @@ class KafkaParcelEventIntegrationTest {
                 mapOf(
                     "bootstrap.servers" to kafka.bootstrapServers,
                     "key.serializer" to StringSerializer::class.java,
-                    "value.serializer" to JsonSerializer::class.java,
+                    "value.serializer" to JacksonJsonSerializer::class.java,
                 ),
             )
 
@@ -63,9 +64,9 @@ class KafkaParcelEventIntegrationTest {
                     ConsumerConfig.GROUP_ID_CONFIG to UUID.randomUUID().toString(),
                     ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
                     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
-                    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to JsonDeserializer::class.java,
-                    JsonDeserializer.TRUSTED_PACKAGES to "com.example.parceldelivery.application.events",
-                    JsonDeserializer.VALUE_DEFAULT_TYPE to ParcelEvent::class.java.name,
+                    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to JacksonJsonDeserializer::class.java,
+                    JacksonJsonDeserializer.TRUSTED_PACKAGES to "com.example.parceldelivery.application.events",
+                    JacksonJsonDeserializer.VALUE_DEFAULT_TYPE to ParcelEvent::class.java.name,
                 ),
             )
 

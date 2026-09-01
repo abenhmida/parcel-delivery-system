@@ -23,6 +23,7 @@ spring:
 
     producer:
       acks: all
+      enable-idempotence: true
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
@@ -32,9 +33,12 @@ spring:
 parcel:
   kafka:
     topic: parcel-events
+    dead-letter-topic: parcel-events.DLT
 
   outbox:
     poll-delay-ms: 1000
 
   consumer:
     max-concurrency: 8
+    concurrency: 3
+    processing-timeout-ms: 5000

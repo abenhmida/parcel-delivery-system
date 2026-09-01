@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.krizaldis.parceldelivery.events.ParcelEvent
 import com.krizaldis.parceldelivery.events.ParcelEventSerializer
 import com.krizaldis.parceldelivery.infrastructure.kafka.JacksonParcelEventSerializer
@@ -17,11 +15,17 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
+import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
-import org.springframework.kafka.support.serializer.JsonSerializer
+import org.springframework.kafka.listener.CommonErrorHandler
+import org.springframework.kafka.listener.ContainerProperties
+import org.springframework.kafka.listener.DefaultErrorHandler
+import org.springframework.kafka.support.serializer.JacksonJsonSerializer
+import org.springframework.util.backoff.FixedBackOff
+import tools.jackson.databind.json.JsonMapper
 
 @Configuration
 class KafkaConfiguration(
@@ -36,7 +40,7 @@ class KafkaConfiguration(
             mapOf(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to JsonSerializer::class.java,
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to JacksonJsonSerializer::class.java,
             )
 
         return DefaultKafkaProducerFactory(properties)
@@ -50,35 +54,40 @@ class KafkaConfiguration(
     fun parcelEventsTopic(): NewTopic = NewTopic(topic, 3, 1)
 
     @Bean
-    fun parcelEventConsumerFactory(): ConcurrentKafkaListenerContainerFactory<String, ParcelEvent> {
-        val consumerFactory =
-            DefaultKafkaConsumerFactory<String, Any>(
-                mapOf(
-                    ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
-                    ConsumerConfig.GROUP_ID_CONFIG to "parcel-delivery-events",
-                    ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to org.apache.kafka.common.serialization.StringDeserializer::class.java,
-                    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to JsonDeserializer::class.java,
-                ),
-            )
+    fun kafkaErrorHandler(): CommonErrorHandler {
+        val backOff = FixedBackOff(1_000L, 2L)
 
-        return ConcurrentKafkaListenerContainerFactory<String, ParcelEvent>().apply {
-            this.setConsumerFactory(consumerFactory)
-            this.setConcurrency(3)
-        }
+        return DefaultErrorHandler(backOff)
     }
 
     @Bean
-    fun jacksonParcelEventSerializer(objectMapper: ObjectMapper): ParcelEventSerializer = JacksonParcelEventSerializer(objectMapper)
+    fun defaultConsumerFactory() =
+        DefaultKafkaConsumerFactory<String, String>(
+            mapOf(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
+                ConsumerConfig.GROUP_ID_CONFIG to "parcel-delivery-events",
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to org.apache.kafka.common.serialization.StringDeserializer::class.java,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to JsonDeserializer::class.java,
+            ),
+        )
 
     @Bean
-    fun objectMapper(): ObjectMapper = ObjectMapperFactory.create()
+    fun parcelEventConsumerFactory(
+        consumerFactory: ConsumerFactory<String, String>,
+        errorHandler: CommonErrorHandler,
+    ): ConcurrentKafkaListenerContainerFactory<String, String> {
+        val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
 
-    object ObjectMapperFactory {
-        fun create(): ObjectMapper =
-            ObjectMapper()
-                .registerModule(KotlinModule.Builder().build())
-                .registerModule(JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        factory.setConsumerFactory(consumerFactory)
+        factory.setConcurrency(3)
+
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.RECORD
+
+        factory.setCommonErrorHandler(errorHandler)
+
+        return factory
     }
+
+    @Bean
+    fun jacksonParcelEventSerializer(objectMapper: JsonMapper): ParcelEventSerializer = JacksonParcelEventSerializer(objectMapper)
 }
