@@ -16,6 +16,7 @@ import com.krizaldis.parceldelivery.domain.TrackingNumberGenerator
 import com.krizaldis.parceldelivery.events.ParcelEvent
 import com.krizaldis.parceldelivery.events.ParcelEventFactory
 import com.krizaldis.parceldelivery.events.ParcelEventHandler
+import com.krizaldis.parceldelivery.events.ParcelEventProcessor
 import com.krizaldis.parceldelivery.events.ParcelEventReceiptRepository
 import com.krizaldis.parceldelivery.events.ParcelEventSerializer
 import com.krizaldis.parceldelivery.events.PersistingParcelEventHandler
@@ -25,6 +26,7 @@ import com.krizaldis.parceldelivery.infrastructure.kafka.OutboxPublisher
 import com.krizaldis.parceldelivery.infrastructure.kafka.ParcelEventConsumer
 import org.flywaydb.core.Flyway
 import org.jooq.DSLContext
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -116,5 +118,7 @@ class ParcelDeliveryConfiguration(
         PersistingParcelEventHandler(receiptRepository)
 
     @Bean
-    fun parcelEventConsumer(parcelEventHandler: ParcelEventHandler): ParcelEventConsumer = ParcelEventConsumer(parcelEventHandler)
+    fun parcelEventConsumer(
+        @Qualifier("persistingParcelEventHandler") parcelEventHandler: ParcelEventHandler,
+    ): ParcelEventConsumer = ParcelEventConsumer(parcelEventHandler)
 }

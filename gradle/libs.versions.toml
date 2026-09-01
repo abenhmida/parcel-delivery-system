@@ -28,7 +28,7 @@ kotlinx-coroutines = "1.10.2"
 kotlin-loggin = "7.0.3"
 logback = "1.6.3"
 
-mockito ="6.3.0"
+mockito = "6.3.0"
 
 [libraries]
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
@@ -57,6 +57,7 @@ spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-
 spring-boot-jooq = { module = "org.springframework.boot:spring-boot-starter-jooq", version.ref = "spring-boot" }
 spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor", version.ref = "spring-boot" }
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test", version.ref = "spring-boot" }
+spring-kafka-test = { module = "org.springframework.kafka:spring-kafka-test", version.ref = "kafkaVersion" }
 
 spring-kafka = { module = "org.springframework.kafka:spring-kafka", version.ref = "kafkaVersion" }
 spring-context = { module = "org.springframework:spring-context" }

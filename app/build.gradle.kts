@@ -40,6 +40,7 @@ dependencies {
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.spring.boot.starter.webmvc.test)
+    testImplementation(libs.spring.kafka.test)
 
     testImplementation(libs.rest.assured)
     testImplementation(libs.rest.assured.kotlin.extensions)

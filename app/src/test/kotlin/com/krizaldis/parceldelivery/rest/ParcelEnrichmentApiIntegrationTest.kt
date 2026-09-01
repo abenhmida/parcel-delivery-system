@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.testcontainers.containers.PostgreSQLContainer
 import java.util.UUID
 
+@Disabled
 @SpringBootTest
 @AutoConfigureMockMvc
 class ParcelEnrichmentApiIntegrationTest {

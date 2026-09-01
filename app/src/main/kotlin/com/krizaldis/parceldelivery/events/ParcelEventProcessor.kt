@@ -8,12 +8,13 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
 class ParcelEventProcessor(
-    private val handler: ParcelEventHandler,
+    @param:Qualifier("persistingParcelEventHandler") private val handler: ParcelEventHandler,
     @Value("\${parcel.consumer.max-concurrency:8}")
     maxConcurrency: Int,
 ) {
