@@ -30,6 +30,13 @@ logback = "1.6.3"
 
 mockito = "6.3.0"
 
+# Observability
+micrometer = "1.15.1"
+opentelemetry = "1.51.0"
+
+otel = "1.65.0"
+otel-semconv = "1.43.0"
+
 [libraries]
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-jupiter" }
@@ -93,6 +100,17 @@ jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin",
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 
 hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+
+micrometerCore = { module = "io.micrometer:micrometer-core", version.ref = "micrometer" }
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "micrometer" }
+micrometer-commons = { module = "io.micrometer:micrometer-commons", version.ref = "micrometer" }
+
+otel-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "otel" }
+otel-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "otel" }
+otel-sdk-trace = { module = "io.opentelemetry:opentelemetry-sdk-trace", version.ref = "otel" }
+otel-sdk-metrics = { module = "io.opentelemetry:opentelemetry-sdk-metrics", version.ref = "otel" }
+otel-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "otel" }
+otel-semconv = { module = "io.opentelemetry.semconv:opentelemetry-semconv", version.ref = "otel-semconv" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

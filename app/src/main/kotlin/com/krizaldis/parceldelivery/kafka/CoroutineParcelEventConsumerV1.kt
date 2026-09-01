@@ -42,11 +42,7 @@ class CoroutineParcelEventConsumerV1(
                     "Processed event ${event.eventId}"
                 }
             } catch (exception: Exception) {
-                logger.error(
-                    "Failed processing event {}",
-                    event.eventId,
-                    exception,
-                )
+                logger.error(exception) { "Failed processing event ${event.eventId}" }
 
                 throw exception
             }

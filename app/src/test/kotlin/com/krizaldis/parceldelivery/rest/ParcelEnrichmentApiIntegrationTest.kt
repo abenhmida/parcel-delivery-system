@@ -1,6 +1,7 @@
 package com.krizaldis.parceldelivery.rest
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,14 +11,15 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.request
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.testcontainers.containers.PostgreSQLContainer
 import java.util.UUID
 
-@Disabled
 @SpringBootTest
 @AutoConfigureMockMvc
 class ParcelEnrichmentApiIntegrationTest {
@@ -49,9 +51,8 @@ class ParcelEnrichmentApiIntegrationTest {
     lateinit var mockMvc: MockMvc
 
     @Test
-    @Disabled
     fun `enrichment endpoint returns concurrent enrichment results`(): Unit =
-        runBlocking {
+        runTest {
             val createResponse =
                 mockMvc
                     .perform(
@@ -76,8 +77,14 @@ class ParcelEnrichmentApiIntegrationTest {
                         .groupValues[1],
                 )
 
+            val mvcResult =
+                mockMvc
+                    .perform(get("/parcels/$id/enrichment"))
+                    .andExpect(request().asyncStarted())
+                    .andReturn()
+
             mockMvc
-                .perform(get("/parcels/$id/enrichment"))
+                .perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.parcelId").value(id.toString()))
                 .andExpect(jsonPath("$.addressVerified").value(true))

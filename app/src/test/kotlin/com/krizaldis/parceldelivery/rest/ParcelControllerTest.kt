@@ -6,6 +6,8 @@ import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -19,7 +21,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.math.BigDecimal
 import java.util.UUID
 
-@Disabled
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ParcelControllerTest {
@@ -27,6 +28,13 @@ class ParcelControllerTest {
     private var port: Int = 0
 
     companion object {
+        @JvmStatic
+        @AfterAll
+        fun tearDown() {
+            postgres.close()
+            postgres.stop()
+        }
+
         @Container
         private val postgres = PostgreSQLContainer("postgres:17")
 

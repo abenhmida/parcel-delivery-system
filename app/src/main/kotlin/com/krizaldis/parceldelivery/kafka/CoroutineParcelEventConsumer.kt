@@ -28,9 +28,6 @@ class CoroutineParcelEventConsumer(
             handler.handle(event)
         }
 
-        logger.info(
-            "Processed event {}",
-            event.eventId,
-        )
+        logger.info { "Processed event ${event.eventId}" }
     }
 }
