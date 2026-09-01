@@ -24,7 +24,7 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension> {
-        jvmToolchain(21)
+        jvmToolchain(25)
     }
 
     dependencies {
