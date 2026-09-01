@@ -101,7 +101,7 @@ class ParcelDeliveryConfiguration(
     fun outboxPublisher(
         outboxRepository: OutboxRepository,
         serializer: ParcelEventSerializer,
-        kafkaTemplate: KafkaTemplate<String, ParcelEvent>,
+        kafkaTemplate: KafkaTemplate<String, Any>,
     ): OutboxPublisher =
         OutboxPublisher(
             outboxRepository = outboxRepository,

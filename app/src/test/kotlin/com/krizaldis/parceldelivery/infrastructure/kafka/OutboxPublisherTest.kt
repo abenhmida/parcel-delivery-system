@@ -23,7 +23,7 @@ class OutboxPublisherTest {
             mock<ParcelEventSerializer>()
 
         val kafka =
-            mock<KafkaTemplate<String, ParcelEvent>>()
+            mock<KafkaTemplate<String, Any>>()
 
         val event =
             event()
@@ -70,7 +70,7 @@ class OutboxPublisherTest {
             mock<ParcelEventSerializer>()
 
         val kafka =
-            mock<KafkaTemplate<String, ParcelEvent>>()
+            mock<KafkaTemplate<String, Any>>()
 
         val event =
             event()

@@ -14,7 +14,7 @@ private val logger = KotlinLogging.logger {}
 class OutboxPublisher(
     private val outboxRepository: OutboxRepository,
     private val serializer: ParcelEventSerializer,
-    private val kafkaTemplate: KafkaTemplate<String, ParcelEvent>,
+    private val kafkaTemplate: KafkaTemplate<String, Any>,
     @param:Value("\${parcel.kafka.topic}")
     private val topic: String,
 ) {

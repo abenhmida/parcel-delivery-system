@@ -6,6 +6,9 @@ spring:
     password: ${DATABASE_USERNAME:parcel}
     username: ${DATABASE_PASSWORD:parcel}
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/parcel_delivery}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
 
   flyway:
     enabled: true

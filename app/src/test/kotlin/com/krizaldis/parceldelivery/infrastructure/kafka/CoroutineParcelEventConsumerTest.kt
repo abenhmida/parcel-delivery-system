@@ -1,4 +1,4 @@
-package com.krizaldis.parceldelivery.kafka
+package com.krizaldis.parceldelivery.infrastructure.kafka
 
 import com.krizaldis.parceldelivery.events.DefaultParcelEventHandler
 import com.krizaldis.parceldelivery.events.ParcelEvent

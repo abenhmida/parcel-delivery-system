@@ -1,13 +1,9 @@
 package com.krizaldis.parceldelivery.configuration
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.krizaldis.parceldelivery.events.ParcelEvent
+import com.krizaldis.parceldelivery.events.NonRetryableParcelEventException
 import com.krizaldis.parceldelivery.events.ParcelEventSerializer
 import com.krizaldis.parceldelivery.infrastructure.kafka.JacksonParcelEventSerializer
-import org.apache.kafka.clients.admin.NewTopic
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
@@ -22,6 +18,7 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
 import org.springframework.kafka.listener.CommonErrorHandler
 import org.springframework.kafka.listener.ContainerProperties
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer
 import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.kafka.support.serializer.JacksonJsonSerializer
 import org.springframework.util.backoff.FixedBackOff
@@ -31,11 +28,13 @@ import tools.jackson.databind.json.JsonMapper
 class KafkaConfiguration(
     @param:Value("\${spring.kafka.bootstrap-servers}")
     private val bootstrapServers: String,
-    @param:Value("\${parcel.kafka.topic}")
-    private val topic: String,
 ) {
     @Bean
-    fun parcelEventProducerFactory(): ProducerFactory<String, ParcelEvent>? {
+    fun kafkaTemplate(parcelEventProducerFactory: ProducerFactory<String, Any>): KafkaTemplate<String, Any> =
+        KafkaTemplate(parcelEventProducerFactory)
+
+    @Bean
+    fun parcelEventProducerFactory(): ProducerFactory<String, Any> {
         val properties =
             mapOf(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
@@ -47,17 +46,22 @@ class KafkaConfiguration(
     }
 
     @Bean
-    fun parcelEventKafkaTemplate(producerFactory: ProducerFactory<String, ParcelEvent>): KafkaTemplate<String, ParcelEvent> =
-        KafkaTemplate(producerFactory)
+    fun parcelEventKafkaTemplate(producerFactory: ProducerFactory<String, Any>): KafkaTemplate<String, Any> = KafkaTemplate(producerFactory)
 
     @Bean
-    fun parcelEventsTopic(): NewTopic = NewTopic(topic, 3, 1)
-
-    @Bean
-    fun kafkaErrorHandler(): CommonErrorHandler {
+    fun kafkaErrorHandler(kafkaTemplate: KafkaTemplate<String, Any>): CommonErrorHandler {
         val backOff = FixedBackOff(1_000L, 2L)
 
-        return DefaultErrorHandler(backOff)
+        val recovery =
+            DeadLetterPublishingRecoverer(
+                kafkaTemplate,
+            )
+
+        return DefaultErrorHandler(recovery, backOff).apply {
+            addNotRetryableExceptions(
+                NonRetryableParcelEventException::class.java,
+            )
+        }
     }
 
     @Bean
